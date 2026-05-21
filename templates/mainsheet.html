@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stank FOOD</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        header {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+        .logo {
+            width: 100px; /* Ширина логотипа */
+            height: 100px; /* Высота логотипа */
+            margin-bottom: 10px; /* Отступ снизу */
+            border-radius: 200%; /* Округление углов для создания круга */
+            overflow: hidden; /* Скрыть часть изображения, выходящую за пределы */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0 auto; /* Центрирование по горизонтали */
+        }
+        .logo img {
+            width: 100%; /* Занять всю ширину родительского элемента */
+            height: auto; /* Сохранить пропорции */
+            object-fit: cover; /* Обрезать изображение, сохраняя его пропорции */
+        }
+        .menu-icon {
+            position: absolute;
+            left: 20px;
+            top: 20px;
+            cursor: pointer;
+            font-size: 50px; /* Размер иконки меню */
+        }
+        .profile-icon {
+            position: absolute;
+            right: 20px;
+            top: -7px;
+            padding: 20px;
+            cursor: pointer;
+            font-size: 50px; /* Размер иконки профиля */
+        }
+        .dropdown {
+            display: none; /* Скрыто по умолчанию */
+            position: absolute;
+            left: 20px;
+            top: 60px; /* Расположение выпадающего списка */
+            background-color: white;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            border-radius: 5px;
+            z-index: 1000; /* Чтобы выпадающий список был поверх других элементов */
+        }
+        .dropdown a {
+            display: block;
+            padding: 10px 15px;
+            text-decoration: none;
+            color: #007bff;
+        }
+        .dropdown a:hover {
+            background-color: #f0f0f0; /* Цвет при наведении */
+        }
+        .title {
+            font-size: 24px;
+            font-weight: bold;
+        }
+        .project-info {
+            font-size: 14px;
+            color: #555;
+        }
+        .language-switcher {
+            position: relative;
+            width: 100px;
+            height: 30px;
+            background-color: #ccc;
+            border-radius: 15px;
+            overflow: hidden;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        .language-button {
+            position: absolute;
+            width: 50%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.3s;
+        }
+        .language-button.ru {
+            background-color: #818cb9;
+            color: white;
+        }
+        .language-button.en {
+            background-color: #f0f0f0;
+            color: black;
+            transform: translateX(100%);
+        }
+        .blocks-container {
+            display: flex;
+            justify-content: center;
+            margin-top: 30px; /* Уменьшен отступ сверху */
+            gap: 20px;
+            width: 100%;
+            height: calc(100vh - 250px); /* Высота блоков занимает оставшееся место */
+        }
+        .block {
+            flex: 1; /* Блоки занимают равную ширину */
+            height: 450px; /* Уменьшена высота блоков */
+            background-size: cover;
+            border-radius: 15px;
+            overflow: hidden;
+            position: relative;
+            transition: transform 0.3s;
+            cursor: pointer;
+            filter: brightness(0.5); /* Тусклый фон по умолчанию */
+        }
+        .block:hover {
+            transform: translateY(-10px);
+            filter: brightness(1); /* Яркий фон при наведении */
+        }
+        .block::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-size: cover;
+            background-position: center;
+            opacity: 1; /* Полная видимость фонового изображения */
+            transition: opacity 0.3s;
+        }
+        .description {
+            position: absolute;
+            bottom: -40px; /* Начальная позиция вне блока */
+            left: 10px;
+            right: 10px;
+            background-color: rgba(255, 255, 255, 0.8);
+            border-radius: 10px;
+            padding: 10px;
+            transition: bottom 0.3s;
+            opacity: 0; /* Скрыто по умолчанию */
+        }
+        .block:hover .description {
+            bottom: 10px; /* Позиция при наведении */
+            opacity: 1; /* Показать описание */
+        }
+        .link-container {
+            margin-top: 30px; /* Уменьшен отступ сверху */
+            display: flex;
+            gap: 20px;
+        }
+        a {
+            text-decoration: none;
+            color: #007bff;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        /* Стили для формы авторизации и регистрации */
+        .auth-container {
+            display: none; /* Скрыто по умолчанию */
+            position: fixed;
+            top: 0;
+            right: 0;
+            height: 100%;
+            width: 400px; /* Ширина окна */
+            background-color: rgba(255, 255, 255, 0.9);
+            border-left: 1px solid #ccc;
+            box-shadow: -2px 0 5px rgba(0, 0, 0, 0.2);
+            padding: 20px;
+            box-sizing: border-box;
+            z-index: 1000; /* Чтобы окно было поверх других элементов */
+        }
+        .auth-container input {
+            width: calc(100% - 25px); /* Учитываем ширину иконки */
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+        .auth-container button {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            background-color: #818cb9;
+            color: white;
+            cursor: pointer;
+            width: 100%; /* Кнопка занимает всю ширину */
+            margin: 5px 0;
+        }
+        .auth-container button:hover {
+            background-color: rgb(32, 165, 231);
+        }
+        .password-container {
+            position: relative;
+        }
+        .password-container .eye-icon {
+            position: absolute;
+            top: 50%;
+            right: 10px;
+            transform: translateY(-50%);
+            cursor: pointer;
+        }
+        .eye-icon {
+            padding: 20px;
+        }
+        /* Стили для крестика закрытия меню */
+        .close-icon {
+            position: absolute;
+            top: 2px;
+            right: 20px;
+            cursor: pointer;
+            font-size: 24px;
+            color: #555;
+        }
+    </style>
+</head>
+<body>
+<header>
+    <div class="logo">
+        <a href="{{url_for('main')}}">
+            <img src="static/images/myPizza4.png" alt="Логотип" style="max-width: 100%; max-height: 100%; border-radius: 10px;">
+        </a>
+    </div>
+    <div class="menu-icon" onclick="toggleDropdown()">☰</div>
+    <div class="profile-icon" onclick="toggleProfile()">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-person-circle" viewBox="0 0 16 16">
+            <path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0"/>
+            <path fill-rule="evenodd" d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8m8-7a7 7 0 0 0-5.468 11.37C3.242 11.226 4.805 10 8 10s4.757 1.225 5.468 2.37A7 7 0 0 0 8 1"/>
+        </svg>
+    </div>
+    <div class="dropdown" id="dropdownMenu">
+        <a href="help.html">Поддержка</a>
+        <a href="admpanel.html">Панель</a>
+        <a href="socieal.html">Контакты</a>
+    </div>
+    <div class="title">ОНЛАЙН ЗАКАЗЫ</div>
+    <div class="project-info">project by TW</div>
+    <div class="language-switcher" onclick="toggleLanguage()">
+        <div class="language-button ru">rus</div>
+        <div class="language-button en">en</div>
+    </div>
+</header>
+<div class="blocks-container">
+    {% for restaurant in restaurants %}
+    <div class="block" style="background-image: url('static/images/{{ restaurant.image_url }}');" onclick="location.href='{{ url_for('menu', restaurant_id=restaurant.id) }}'">
+        <div class="description">{{ restaurant.description }}</div>
+    </div>
+    {% endfor %}
+</div>
+<!-- Форма авторизации и регистрации -->
+<div class="auth-container" id="authContainer">
+    <div class="close-icon" onclick="toggleProfile()">✖</div> 
+    <div id="authButtons">
+        <button onclick="showLogin()">Авторизироваться</button>
+        <button onclick="showRegister()">Зарегистрироваться</button>
+    </div>
+    <div id="loginForm" style="display: none;">
+        <input type="phone" placeholder="Введите ваш телефон" id="phone" />
+        <div class="password-container">
+            <input type="password" placeholder="Введи ваш пароль" id="password" />
+            <span class="eye-icon" onclick="togglePasswordVisibility('password')"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-eye-slash-fill" viewBox="0 0 16 16">
+                <path d="m10.79 12.912-1.614-1.615a3.5 3.5 0 0 1-4.474-4.474l-2.06-2.06C.938 6.278 0 8 0 8s3 5.5 8 5.5a7 7 0 0 0 2.79-.588M5.21 3.088A7 7 0 0 1 8 2.5c5 0 8 5.5 8 5.5s-.939 1.721-2.641 3.238l-2.062-2.062a3.5 3.5 0 0 0-4.474-4.474z"/>
+                <path d="M5.525 7.646a2.5 2.5 0 0 0 2.829 2.829zm4.95.708-2.829-2.83a2.5 2.5 0 0 1 2.829 2.829zm3.171 6-12-12 .708-.708 12 12z"/>
+              </svg></span>
+        </div>
+        <button onclick="login()" action="login">Войти</button>
+    </div>
+    <div id="registerForm" style="display: none;">
+        <input type="text" placeholder="Ваше имя" id="name" />
+        <input type="phone" placeholder="Ваш номер телефона" id="RegisterPhone" />
+        <div class="password-container">
+            <input type="password" placeholder="Введите уникальный пароль" id="registerPassword" />
+            <span class="eye-icon" onclick="togglePasswordVisibility('registerPassword')"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-eye-slash-fill" viewBox="0 0 16 16">
+                <path d="m10.79 12.912-1.614-1.615a3.5 3.5 0 0 1-4.474-4.474l-2.06-2.06C.938 6.278 0 8 0 8s3 5.5 8 5.5a7 7 0 0 0 2.79-.588M5.21 3.088A7 7 0 0 1 8 2.5c5 0 8 5.5 8 5.5s-.939 1.721-2.641 3.238l-2.062-2.062a3.5 3.5 0 0 0-4.474-4.474z"/>
+                <path d="M5.525 7.646a2.5 2.5 0 0 0 2.829 2.829zm4.95.708-2.829-2.83a2.5 2.5 0 0 1 2.829 2.829zm3.171 6-12-12 .708-.708 12 12z"/>
+              </svg></span>
+        </div>
+        <button onclick="generatePassword()">Сгенерировать пароль</button>
+        <button onclick="register()" action="register">Зарегистрироваться</button>
+    </div>
+</div>
+<div class="link-container">
+    <a href="#">Пользовательское соглашение</a>
+    <a href="#">Официальный Канал проекта</a>
+</div>
+<script>
+    const isAuthenticated = {{ current_user.is_authenticated | tojson }};
+    const profileUrl = "{{ url_for('profile') }}";
+</script>
+<script src="/static/mainsheet.js"></script>
+</body>
+</html>
