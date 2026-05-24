@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% block title %}Аналитика — Stank FOOD{% endblock %}
+{% block content %}
+<section class="stats-grid">
+    <article class="stat-card">
+        <strong>{{ analytics.revenue }} ₽</strong>
+        <span>Выручка</span>
+    </article>
+    <article class="stat-card">
+        <strong>{{ analytics.orders_total }}</strong>
+        <span>Всего заказов</span>
+    </article>
+    <article class="stat-card">
+        <strong>{{ analytics.top_dishes|length }}</strong>
+        <span>Популярных позиций</span>
+    </article>
+</section>
+
+<section class="split">
+    <div class="card">
+        <h2>Статусы заказов</h2>
+        <div class="admin-list">
+            {% for status, count in analytics.status_counts.items() %}
+                <article class="admin-item"><strong>{{ status_labels.get(status, status) }}</strong><span>{{ count }}</span></article>
+            {% else %}
+                <p>Данных пока нет.</p>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="card">
+        <h2>Популярные блюда</h2>
+        <div class="admin-list">
+            {% for name, count in analytics.top_dishes %}
+                <article class="admin-item"><strong>{{ name }}</strong><span>{{ count }} шт.</span></article>
+            {% else %}
+                <p>Данных пока нет.</p>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<section class="split">
+    <div class="card">
+        <h2>Продажи по дням недели</h2>
+        <div class="admin-list">
+            {% for day, total in analytics.weekday_sales.items() %}
+                <article class="admin-item"><strong>{{ day }}</strong><span>{{ total }} ₽</span></article>
+            {% else %}
+                <p>Данных пока нет.</p>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="card">
+        <h2>Продажи по времени суток</h2>
+        <div class="admin-list">
+            {% for meal, total in analytics.meal_sales.items() %}
+                <article class="admin-item"><strong>{{ meal }}</strong><span>{{ total }} ₽</span></article>
+            {% else %}
+                <p>Данных пока нет.</p>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endblock %}

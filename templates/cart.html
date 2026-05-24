@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block title %}Корзина — Stank FOOD{% endblock %}
+{% block content %}
+<section class="card">
+    <div class="section-heading">
+        <h1>Корзина</h1>
+        <p>Можно изменить количество, удалить позиции и оформить заказ со слотом выдачи.</p>
+    </div>
+
+    {% if mixed_restaurants %}
+        <div class="flash danger">{{ mixed_restaurants }}</div>
+    {% endif %}
+
+    {% if items %}
+        <div class="cart-list">
+            {% for item in items %}
+            <article class="cart-item">
+                <img src="{{ url_for('static', filename='images/' ~ item.dish.image_url) }}" alt="{{ item.dish.name }}">
+                <div class="cart-item-info">
+                    <h2>{{ item.dish.name }}</h2>
+                    <p>{{ item.dish.description }}</p>
+                    <span class="muted">{{ item.dish.restaurant.name }} · {{ item.dish.weight_grams }} г</span>
+                </div>
+                <div class="cart-item-side">
+                    <strong>{{ item.dish.price }} ₽</strong>
+                    <div class="quantity-controls">
+                        <button class="quantity-button update-cart" data-dish-id="{{ item.product_id }}" data-quantity="{{ item.quantity - 1 }}">−</button>
+                        <span>{{ item.quantity }}</span>
+                        <button class="quantity-button update-cart" data-dish-id="{{ item.product_id }}" data-quantity="{{ item.quantity + 1 }}">+</button>
+                    </div>
+                </div>
+            </article>
+            {% endfor %}
+        </div>
+        <form action="{{ url_for('checkout') }}" method="post" class="checkout-box stack-form">
+            <strong>Итого: {{ total }} ₽</strong>
+            <label>Слот выдачи
+                <select name="pickup_slot_id" {% if mixed_restaurants or not slots %}disabled{% endif %} required>
+                    <option value="">Выберите слот</option>
+                    {% for slot in slots %}
+                        <option value="{{ slot.id }}">{{ slot.label }} · свободно {{ slot.available_capacity }}</option>
+                    {% endfor %}
+                </select>
+            </label>
+            <button type="submit" class="button" {% if mixed_restaurants or not slots %}disabled{% endif %}>Оформить и оплатить</button>
+        </form>
+    {% else %}
+        <p>Корзина пока пуста. Выберите блюда в меню любой столовой.</p>
+    {% endif %}
+</section>
+{% endblock %}

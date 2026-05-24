@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+{% block title %}Личный кабинет — Stank FOOD{% endblock %}
+{% block content %}
+<section class="split">
+    <div class="card">
+        <h1>Профиль</h1>
+        <form id="profileForm" class="stack-form">
+            <label>Имя
+                <input type="text" name="name" value="{{ current_user.username }}" required>
+            </label>
+            <label>Телефон
+                <input type="text" name="phone" value="{{ current_user.phone_number }}" required>
+            </label>
+            <label>Email
+                <input type="email" name="email" value="{{ current_user.email or '' }}">
+            </label>
+            <label>Любимое время приема пищи
+                <select name="favorite_category">
+                    <option value="">Не выбрано</option>
+                    {% for category in categories %}
+                        <option value="{{ category }}" {% if current_user.favorite_category == category %}selected{% endif %}>{{ category }}</option>
+                    {% endfor %}
+                </select>
+            </label>
+            <label>Новый пароль
+                <input type="password" name="password" minlength="6" placeholder="Оставьте пустым, чтобы не менять">
+            </label>
+            <button type="submit" class="button">Сохранить</button>
+        </form>
+    </div>
+
+    <div class="card">
+        <h2>Уведомления</h2>
+        <div class="admin-list">
+            {% for item in notifications %}
+                <article class="admin-item">
+                    <div>
+                        <strong>{{ item.message }}</strong>
+                        <p class="muted">{{ item.created_at.strftime('%d.%m.%Y %H:%M') }}</p>
+                    </div>
+                </article>
+            {% else %}
+                <p>Уведомлений пока нет.</p>
+            {% endfor %}
+        </div>
+        <button id="markNotificationsRead" class="button ghost">Отметить как прочитанные</button>
+    </div>
+</section>
+
+<section class="split">
+    <div class="card">
+        <h2>История заказов</h2>
+        <div class="admin-list">
+            {% for order in orders %}
+                <article class="admin-item">
+                    <div>
+                        <strong>Заказ {{ order.order_number }}</strong>
+                        <p>{{ order.restaurant.name }} · {{ order.pickup_slot.label }}</p>
+                        <p class="muted">{{ status_labels[order.status] }} · {{ order.total_amount }} ₽ · QR: {{ order.qr_payload }}</p>
+                    </div>
+                    <button class="button reorder-button" data-order-id="{{ order.id }}">Повторить</button>
+                </article>
+            {% else %}
+                <p>Заказов пока нет.</p>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="card">
+        <h2>Любимые блюда</h2>
+        <div class="admin-list">
+            {% for favorite in favorites %}
+                <article class="admin-item">
+                    <div>
+                        <strong>{{ favorite.dish.name }}</strong>
+                        <p>{{ favorite.dish.restaurant.name }} · {{ favorite.dish.price }} ₽</p>
+                    </div>
+                    <a class="button ghost" href="{{ url_for('menu', restaurant_id=favorite.dish.restaurant_id) }}">Открыть меню</a>
+                </article>
+            {% else %}
+                <p>Пока ничего не сохранено.</p>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endblock %}
+{% block scripts %}
+<script src="{{ url_for('static', filename='profile.js') }}"></script>
+{% endblock %}

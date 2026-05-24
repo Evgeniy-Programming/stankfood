@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block title %}{{ restaurant.name }} — Stank FOOD{% endblock %}
+{% block content %}
+<section class="restaurant-hero">
+    <img src="{{ url_for('static', filename='images/' ~ restaurant.image_url) }}" alt="{{ restaurant.name }}">
+    <div>
+        <span class="badge">Столовая</span>
+        <h1>{{ restaurant.name }}</h1>
+        <p>{{ restaurant.description }}</p>
+        <div class="pill-row">
+            <span class="pill">Только опубликованные блюда</span>
+            <span class="pill">Слоты выдачи с учетом загрузки</span>
+        </div>
+    </div>
+</section>
+
+<section class="card">
+    <form method="get" class="filter-bar">
+        <label>Категория
+            <select name="category" onchange="this.form.submit()">
+                <option value="">Все</option>
+                {% for category in categories %}
+                    <option value="{{ category.name }}" {% if selected_category == category.name %}selected{% endif %}>{{ category.name }}</option>
+                {% endfor %}
+            </select>
+        </label>
+    </form>
+
+    <div class="cards-grid compact-grid">
+        {% for dish in dishes %}
+        <article class="dish-card">
+            <img class="card-image" src="{{ url_for('static', filename='images/' ~ dish.image_url) }}" alt="{{ dish.name }}">
+            <div class="card-body">
+                <span class="muted">{{ dish.category }} · {{ dish.weight_grams }} г</span>
+                <h2>{{ dish.name }}</h2>
+                <p>{{ dish.description }}</p>
+                <p class="small-text"><strong>Состав:</strong> {{ dish.ingredients }}</p>
+                <div class="card-actions wrap">
+                    <strong>{{ dish.price }} ₽</strong>
+                    {% if current_user.is_authenticated %}
+                        <div class="inline-actions">
+                            <button class="button add-to-cart" data-dish-id="{{ dish.id }}" data-quantity="1">В корзину</button>
+                            <button class="button ghost toggle-favorite" data-dish-id="{{ dish.id }}">
+                                {% if dish.id in favorite_ids %}В любимых{% else %}В любимое{% endif %}
+                            </button>
+                        </div>
+                    {% else %}
+                        <a class="button secondary" href="{{ url_for('main') }}#auth">Войдите, чтобы заказать</a>
+                    {% endif %}
+                </div>
+            </div>
+        </article>
+        {% else %}
+        <p>В этой категории пока нет блюд.</p>
+        {% endfor %}
+    </div>
+</section>
+{% endblock %}

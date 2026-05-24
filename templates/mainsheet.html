@@ -1,0 +1,128 @@
+{% extends "base.html" %}
+{% block title %}Главная — Stank FOOD{% endblock %}
+{% block content %}
+<section class="hero">
+    <div class="hero-copy">
+        <span class="badge">Stank FOOD</span>
+        <h1>Онлайн-заказ питания без очередей</h1>
+        <p>Выбирайте блюда из двух столовых, бронируйте слот выдачи заранее, оплачивайте заказ на сайте и отслеживайте статус в личном кабинете.</p>
+        <div class="hero-actions">
+            <a class="button" href="#restaurants">Выбрать столовую</a>
+            {% if not current_user.is_authenticated %}
+                <a class="button secondary" href="#auth">Войти или зарегистрироваться</a>
+            {% else %}
+                <a class="button secondary" href="{{ url_for('profile') }}">Открыть кабинет</a>
+            {% endif %}
+        </div>
+    </div>
+    <div class="hero-media">
+        <img src="{{ url_for('static', filename='images/MyPizza.jpg') }}" alt="Еда">
+    </div>
+</section>
+
+<section class="stats-grid">
+    <article class="stat-card">
+        <strong>{{ restaurants|length }}</strong>
+        <span>Столовые</span>
+    </article>
+    <article class="stat-card">
+        <strong>{{ analytics.orders_total }}</strong>
+        <span>Оформлено заказов</span>
+    </article>
+    <article class="stat-card">
+        <strong>{{ analytics.revenue }} ₽</strong>
+        <span>Оплачено через demo-gateway</span>
+    </article>
+</section>
+
+<section id="restaurants" class="section-block">
+    <div class="section-heading">
+        <h2>Доступные столовые</h2>
+        <p>В проекте оставлены только две столовые, как вы просили.</p>
+    </div>
+    <div class="cards-grid">
+        {% for restaurant in restaurants %}
+        <article class="card">
+            <img class="card-image" src="{{ url_for('static', filename='images/' ~ restaurant.image_url) }}" alt="{{ restaurant.name }}">
+            <div class="card-body">
+                <h3>{{ restaurant.name }}</h3>
+                <p>{{ restaurant.description }}</p>
+                <a class="button" href="{{ url_for('menu', restaurant_id=restaurant.id) }}">Открыть меню</a>
+            </div>
+        </article>
+        {% endfor %}
+    </div>
+</section>
+
+<section class="section-block">
+    <div class="section-heading">
+        <h2>Популярные блюда</h2>
+        <p>Меню фильтруется по времени приема пищи: завтрак, обед, ужин.</p>
+    </div>
+    <div class="cards-grid compact-grid">
+        {% for dish in popular_dishes %}
+        <article class="dish-card">
+            <img class="card-image" src="{{ url_for('static', filename='images/' ~ dish.image_url) }}" alt="{{ dish.name }}">
+            <div class="card-body">
+                <span class="muted">{{ dish.category }} · {{ dish.weight_grams }} г</span>
+                <h3>{{ dish.name }}</h3>
+                <p>{{ dish.description }}</p>
+                <div class="price-row">
+                    <strong>{{ dish.price }} ₽</strong>
+                    <a class="button ghost" href="{{ url_for('menu', restaurant_id=dish.restaurant_id) }}">К меню</a>
+                </div>
+            </div>
+        </article>
+        {% endfor %}
+    </div>
+</section>
+
+{% if not current_user.is_authenticated %}
+<section class="split auth-section" id="auth">
+    <div class="card auth-card">
+        <h2>Вход</h2>
+        <form id="loginForm" class="stack-form">
+            <input type="hidden" name="action" value="login">
+            <label>Телефон
+                <input type="text" name="phone" placeholder="+79991234567" required>
+            </label>
+            <label>Пароль
+                <input type="password" name="password" required>
+            </label>
+            <button type="submit" class="button">Войти</button>
+        </form>
+    </div>
+    <div class="card auth-card">
+        <h2>Регистрация</h2>
+        <form id="registerForm" class="stack-form">
+            <input type="hidden" name="action" value="register">
+            <label>Имя
+                <input type="text" name="name" required>
+            </label>
+            <label>Телефон
+                <input type="text" name="phone" placeholder="+79991234567" required>
+            </label>
+            <label>Email
+                <input type="email" name="email" placeholder="mail@example.com">
+            </label>
+            <label>Пароль
+                <input type="password" name="password" minlength="6" required>
+            </label>
+            <button type="submit" class="button">Зарегистрироваться</button>
+        </form>
+    </div>
+</section>
+{% else %}
+<section class="card">
+    <h2>Быстрые действия</h2>
+    <div class="action-grid">
+        <a class="quick-link" href="{{ url_for('cart') }}">Перейти в корзину</a>
+        <a class="quick-link" href="{{ url_for('profile') }}">История заказов</a>
+        {% if current_user.is_staff %}
+            <a class="quick-link" href="{{ url_for('staff_orders') }}">Панель персонала</a>
+            <a class="quick-link" href="{{ url_for('analytics') }}">Отчет по продажам</a>
+        {% endif %}
+    </div>
+</section>
+{% endif %}
+{% endblock %}

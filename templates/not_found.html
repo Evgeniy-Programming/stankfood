@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block title %}Страница не найдена — Stank FOOD{% endblock %}
+{% block content %}
+<section class="card center narrow">
+    <img class="not-found-image" src="{{ url_for('static', filename='images/maintenance.png') }}" alt="Not found">
+    <h1>Страница не найдена</h1>
+    <p>Похоже, ссылка устарела. Вернитесь на главную или откройте одну из двух столовых.</p>
+    <a class="button" href="{{ url_for('main') }}">На главную</a>
+</section>
+{% endblock %}
